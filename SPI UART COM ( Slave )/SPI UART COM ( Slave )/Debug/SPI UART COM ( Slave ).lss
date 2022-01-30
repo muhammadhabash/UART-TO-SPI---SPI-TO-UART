@@ -1,0 +1,342 @@
+
+SPI UART COM ( Slave ).elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000001a0  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000001f4  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000001f4  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000224  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 000000e8  00000000  00000000  00000260  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000b69  00000000  00000000  00000348  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000007f9  00000000  00000000  00000eb1  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   0000066f  00000000  00000000  000016aa  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  000001d0  00000000  00000000  00001d1c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000536  00000000  00000000  00001eec  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    000005f4  00000000  00000000  00002422  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 000000a8  00000000  00000000  00002a16  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 36 00 	call	0x6c	; 0x6c <main>
+  64:	0c 94 ce 00 	jmp	0x19c	; 0x19c <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <main>:
+#include "MCAL/UART/UART_interface.h"
+#include "MCAL/SPI/SPI_interface.h"
+
+int main(){
+  6c:	cf 93       	push	r28
+  6e:	df 93       	push	r29
+  70:	cd b7       	in	r28, 0x3d	; 61
+  72:	de b7       	in	r29, 0x3e	; 62
+  74:	64 97       	sbiw	r28, 0x14	; 20
+  76:	0f b6       	in	r0, 0x3f	; 63
+  78:	f8 94       	cli
+  7a:	de bf       	out	0x3e, r29	; 62
+  7c:	0f be       	out	0x3f, r0	; 63
+  7e:	cd bf       	out	0x3d, r28	; 61
+	
+	uint8_t u8_buffer[20];
+	UART_init();
+  80:	0e 94 ab 00 	call	0x156	; 0x156 <UART_init>
+	SPI_init();
+  84:	0e 94 79 00 	call	0xf2	; 0xf2 <SPI_init>
+	
+	
+	while(1){
+		SPI_slaveReceiveString(u8_buffer);
+  88:	ce 01       	movw	r24, r28
+  8a:	01 96       	adiw	r24, 0x01	; 1
+  8c:	0e 94 8f 00 	call	0x11e	; 0x11e <SPI_slaveReceiveString>
+		UART_sendString(u8_buffer);
+  90:	ce 01       	movw	r24, r28
+  92:	01 96       	adiw	r24, 0x01	; 1
+  94:	0e 94 b8 00 	call	0x170	; 0x170 <UART_sendString>
+  98:	f7 cf       	rjmp	.-18     	; 0x88 <main+0x1c>
+
+0000009a <GPIO_dir>:
+}
+
+uint8_t GPIO_dir(uint8_t u8_port, uint8_t u8_bit, uint8_t u8_mode)
+{
+	uint8_t* u8_reg;
+	if (u8_port >= A && u8_port <= D)
+  9a:	8a 30       	cpi	r24, 0x0A	; 10
+  9c:	20 f5       	brcc	.+72     	; 0xe6 <GPIO_dir+0x4c>
+	{
+		u8_reg = (uint8_t*)(GPIO_DIR_R - (u8_port -A));
+  9e:	2a e3       	ldi	r18, 0x3A	; 58
+  a0:	30 e0       	ldi	r19, 0x00	; 0
+  a2:	f9 01       	movw	r30, r18
+  a4:	e8 1b       	sub	r30, r24
+  a6:	f1 09       	sbc	r31, r1
+		if ( u8_bit >= LEAST_SIGNIFICANT_BIT && u8_bit <= MOST_SIGNIFICANT_BIT )
+  a8:	68 30       	cpi	r22, 0x08	; 8
+  aa:	f8 f4       	brcc	.+62     	; 0xea <GPIO_dir+0x50>
+		{
+			if (OUTPUT == u8_mode)
+  ac:	41 30       	cpi	r20, 0x01	; 1
+  ae:	61 f4       	brne	.+24     	; 0xc8 <GPIO_dir+0x2e>
+			{
+				GPIO_SET(u8_reg,u8_bit);	
+  b0:	81 e0       	ldi	r24, 0x01	; 1
+  b2:	90 e0       	ldi	r25, 0x00	; 0
+  b4:	02 c0       	rjmp	.+4      	; 0xba <GPIO_dir+0x20>
+  b6:	88 0f       	add	r24, r24
+  b8:	99 1f       	adc	r25, r25
+  ba:	6a 95       	dec	r22
+  bc:	e2 f7       	brpl	.-8      	; 0xb6 <GPIO_dir+0x1c>
+  be:	90 81       	ld	r25, Z
+  c0:	89 2b       	or	r24, r25
+  c2:	80 83       	st	Z, r24
+	}
+	else 
+	{
+		return WRONG_PORT;
+	}
+	return NO_ERRORS;
+  c4:	84 e0       	ldi	r24, 0x04	; 4
+  c6:	08 95       	ret
+		{
+			if (OUTPUT == u8_mode)
+			{
+				GPIO_SET(u8_reg,u8_bit);	
+			}
+			else if (INPUT == u8_mode)
+  c8:	41 11       	cpse	r20, r1
+  ca:	11 c0       	rjmp	.+34     	; 0xee <GPIO_dir+0x54>
+			{
+				GPIO_CLEAR(u8_reg,u8_bit);
+  cc:	81 e0       	ldi	r24, 0x01	; 1
+  ce:	90 e0       	ldi	r25, 0x00	; 0
+  d0:	02 c0       	rjmp	.+4      	; 0xd6 <GPIO_dir+0x3c>
+  d2:	88 0f       	add	r24, r24
+  d4:	99 1f       	adc	r25, r25
+  d6:	6a 95       	dec	r22
+  d8:	e2 f7       	brpl	.-8      	; 0xd2 <GPIO_dir+0x38>
+  da:	80 95       	com	r24
+  dc:	90 81       	ld	r25, Z
+  de:	89 23       	and	r24, r25
+  e0:	80 83       	st	Z, r24
+	}
+	else 
+	{
+		return WRONG_PORT;
+	}
+	return NO_ERRORS;
+  e2:	84 e0       	ldi	r24, 0x04	; 4
+  e4:	08 95       	ret
+			return WRONG_PIN;
+		}
+	}
+	else 
+	{
+		return WRONG_PORT;
+  e6:	82 e0       	ldi	r24, 0x02	; 2
+  e8:	08 95       	ret
+				return WRONG_MODE;
+			}
+		}
+		else
+		{
+			return WRONG_PIN;
+  ea:	81 e0       	ldi	r24, 0x01	; 1
+  ec:	08 95       	ret
+			{
+				GPIO_CLEAR(u8_reg,u8_bit);
+			}
+			else
+			{
+				return WRONG_MODE;
+  ee:	83 e0       	ldi	r24, 0x03	; 3
+	else 
+	{
+		return WRONG_PORT;
+	}
+	return NO_ERRORS;
+}
+  f0:	08 95       	ret
+
+000000f2 <SPI_init>:
+	
+	do{
+		SPI_masterTransmitByte(u8_buffer[u8_index]);
+		u8_index++;
+	}while (u8_buffer[u8_index - 1] != '\0');
+}
+  f2:	41 e0       	ldi	r20, 0x01	; 1
+  f4:	66 e0       	ldi	r22, 0x06	; 6
+  f6:	83 e0       	ldi	r24, 0x03	; 3
+  f8:	0e 94 4d 00 	call	0x9a	; 0x9a <GPIO_dir>
+  fc:	8d b1       	in	r24, 0x0d	; 13
+  fe:	80 64       	ori	r24, 0x40	; 64
+ 100:	8d b9       	out	0x0d, r24	; 13
+ 102:	8d b1       	in	r24, 0x0d	; 13
+ 104:	8f 77       	andi	r24, 0x7F	; 127
+ 106:	8d b9       	out	0x0d, r24	; 13
+ 108:	8f b7       	in	r24, 0x3f	; 63
+ 10a:	8f 77       	andi	r24, 0x7F	; 127
+ 10c:	8f bf       	out	0x3f, r24	; 63
+ 10e:	8d b1       	in	r24, 0x0d	; 13
+ 110:	8f 7d       	andi	r24, 0xDF	; 223
+ 112:	8d b9       	out	0x0d, r24	; 13
+ 114:	08 95       	ret
+
+00000116 <SPI_slaveReceiveByte>:
+ 116:	77 9b       	sbis	0x0e, 7	; 14
+ 118:	fe cf       	rjmp	.-4      	; 0x116 <SPI_slaveReceiveByte>
+ 11a:	8f b1       	in	r24, 0x0f	; 15
+ 11c:	08 95       	ret
+
+0000011e <SPI_slaveReceiveString>:
+
+void SPI_slaveReceiveString(uint8_t* u8_buffer){
+ 11e:	ef 92       	push	r14
+ 120:	ff 92       	push	r15
+ 122:	0f 93       	push	r16
+ 124:	1f 93       	push	r17
+ 126:	cf 93       	push	r28
+ 128:	8c 01       	movw	r16, r24
+	
+	uint8_t u8_index = 0;
+ 12a:	c0 e0       	ldi	r28, 0x00	; 0
+	
+	do{
+		u8_buffer[u8_index] = SPI_slaveReceiveByte();
+ 12c:	78 01       	movw	r14, r16
+ 12e:	ec 0e       	add	r14, r28
+ 130:	f1 1c       	adc	r15, r1
+ 132:	0e 94 8b 00 	call	0x116	; 0x116 <SPI_slaveReceiveByte>
+ 136:	f7 01       	movw	r30, r14
+ 138:	80 83       	st	Z, r24
+		u8_index++;
+ 13a:	cf 5f       	subi	r28, 0xFF	; 255
+	}while (u8_buffer[u8_index - 1] != '\0');
+ 13c:	f8 01       	movw	r30, r16
+ 13e:	ec 0f       	add	r30, r28
+ 140:	f1 1d       	adc	r31, r1
+ 142:	31 97       	sbiw	r30, 0x01	; 1
+ 144:	80 81       	ld	r24, Z
+ 146:	81 11       	cpse	r24, r1
+ 148:	f1 cf       	rjmp	.-30     	; 0x12c <SPI_slaveReceiveString+0xe>
+ 14a:	cf 91       	pop	r28
+ 14c:	1f 91       	pop	r17
+ 14e:	0f 91       	pop	r16
+ 150:	ff 90       	pop	r15
+ 152:	ef 90       	pop	r14
+ 154:	08 95       	ret
+
+00000156 <UART_init>:
+uint8_t UART_receive(void){
+	
+	while (!(UCSA_R & (1 << RXC)));
+	
+	return UD_R;
+}
+ 156:	89 e1       	ldi	r24, 0x19	; 25
+ 158:	89 b9       	out	0x09, r24	; 9
+ 15a:	8a b1       	in	r24, 0x0a	; 10
+ 15c:	88 61       	ori	r24, 0x18	; 24
+ 15e:	8a b9       	out	0x0a, r24	; 10
+ 160:	80 b5       	in	r24, 0x20	; 32
+ 162:	8e 68       	ori	r24, 0x8E	; 142
+ 164:	80 bd       	out	0x20, r24	; 32
+ 166:	08 95       	ret
+
+00000168 <UART_transmit>:
+ 168:	5d 9b       	sbis	0x0b, 5	; 11
+ 16a:	fe cf       	rjmp	.-4      	; 0x168 <UART_transmit>
+ 16c:	8c b9       	out	0x0c, r24	; 12
+ 16e:	08 95       	ret
+
+00000170 <UART_sendString>:
+
+void UART_sendString(uint8_t* u8_string){
+ 170:	0f 93       	push	r16
+ 172:	1f 93       	push	r17
+ 174:	cf 93       	push	r28
+ 176:	8c 01       	movw	r16, r24
+	
+	uint8_t u8_index;
+	for (u8_index = 0 ; u8_string[u8_index] != '\0' ; u8_index++){
+ 178:	c0 e0       	ldi	r28, 0x00	; 0
+ 17a:	03 c0       	rjmp	.+6      	; 0x182 <UART_sendString+0x12>
+		
+		UART_transmit(u8_string[u8_index]);
+ 17c:	0e 94 b4 00 	call	0x168	; 0x168 <UART_transmit>
+}
+
+void UART_sendString(uint8_t* u8_string){
+	
+	uint8_t u8_index;
+	for (u8_index = 0 ; u8_string[u8_index] != '\0' ; u8_index++){
+ 180:	cf 5f       	subi	r28, 0xFF	; 255
+ 182:	f8 01       	movw	r30, r16
+ 184:	ec 0f       	add	r30, r28
+ 186:	f1 1d       	adc	r31, r1
+ 188:	80 81       	ld	r24, Z
+ 18a:	81 11       	cpse	r24, r1
+ 18c:	f7 cf       	rjmp	.-18     	; 0x17c <UART_sendString+0xc>
+		
+		UART_transmit(u8_string[u8_index]);
+	}
+	UART_transmit('\r');
+ 18e:	8d e0       	ldi	r24, 0x0D	; 13
+ 190:	0e 94 b4 00 	call	0x168	; 0x168 <UART_transmit>
+}
+ 194:	cf 91       	pop	r28
+ 196:	1f 91       	pop	r17
+ 198:	0f 91       	pop	r16
+ 19a:	08 95       	ret
+
+0000019c <_exit>:
+ 19c:	f8 94       	cli
+
+0000019e <__stop_program>:
+ 19e:	ff cf       	rjmp	.-2      	; 0x19e <__stop_program>
